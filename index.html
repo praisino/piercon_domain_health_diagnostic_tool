@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Health Diagnostic | Powered by Piercon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        /* Custom Scrollbar for the text area */
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #d4d4d8; border-radius: 20px; }
+        @media (prefers-color-scheme: dark) {
+            .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #3f3f46; }
+        }
+        
+        /* Smooth base transitions */
+        body { 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-zinc-900 transition-colors duration-300">
+
+    <!-- Minimalist Navigation -->
+    <nav class="border-b border-zinc-200/80 bg-white/60 dark:border-zinc-800/60 dark:bg-zinc-950/60 backdrop-blur-lg sticky top-0 z-40 transition-colors duration-300">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <span class="font-semibold text-sm sm:text-base tracking-tight text-zinc-900 dark:text-zinc-100">
+                    Domain Health Diagnostic Tool
+                </span>
+            </div>
+            <div class="flex items-center">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2 shrink-0"></span> Live DoH
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Application -->
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex-grow w-full flex flex-col items-center">
+        
+        <!-- Refined Hero Section -->
+        <div class="text-center max-w-2xl mx-auto mb-12 animate-fade-in">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white tracking-tight leading-[1.15] mb-5">
+                Is your domain marked as spam by Google & Yahoo?
+            </h1>
+            <p class="text-zinc-600 dark:text-zinc-400 text-base sm:text-lg font-normal max-w-xl mx-auto leading-relaxed">
+                Run a live diagnostic scan on your SPF and DMARC security protocols to ensure 100% cold email deliverability.
+            </p>
+        </div>
+
+        <!-- Inline Error Alert -->
+        <div id="errorBanner" class="hidden w-full mb-6 bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50 text-sm flex items-center shadow-sm animate-fade-in" role="alert">
+            <svg class="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p class="font-medium">Diagnostic failed. Please verify the domain name format (e.g., example.com) and try again.</p>
+        </div>
+
+        <!-- Elegant Search Interface -->
+        <div class="w-full bg-white dark:bg-zinc-900 rounded-2xl p-2 sm:p-3 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors duration-300 mb-12 animate-slide-up">
+            <form id="auditForm" class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-grow flex items-center">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="domainInput" 
+                        aria-label="Domain Name"
+                        placeholder="Enter domain (e.g., devcommx.com)" 
+                        required 
+                        class="w-full bg-transparent border-0 text-zinc-900 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-0 dark:text-zinc-100 text-base transition pl-12 py-3"
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 font-medium px-8 py-3.5 rounded-xl transition duration-200 ease-in-out flex items-center justify-center space-x-2 text-sm shrink-0"
+                >
+                    <span id="btnText">Scan Domain</span>
+                    <svg id="btnSpinner" class="hidden w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- Diagnostic Output Container -->
+        <div id="resultsContainer" class="hidden w-full space-y-6">
+            
+            <!-- Overall Status Header Card -->
+            <div id="statusBanner" class="bg-white border-zinc-200 dark:bg-zinc-900 border dark:border-zinc-800 rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div class="flex-grow">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span id="vulnerabilityBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">STATUS</span>
+                        <span id="targetDomainLabel" class="text-sm font-mono text-zinc-500 dark:text-zinc-400 truncate max-w-[200px] sm:max-w-none">domain.com</span>
+                    </div>
+                    <h2 id="statusTitle" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">--</h2>
+                    <p id="statusDesc" class="text-zinc-500 dark:text-zinc-400 text-sm mt-1.5 leading-relaxed max-w-lg">--</p>
+                </div>
+            </div>
+
+            <!-- Technical Detail Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- SPF Card -->
+                <div class="bg-white border-zinc-200 dark:bg-zinc-900 border dark:border-zinc-800 p-5 rounded-2xl flex flex-col shadow-sm transition-colors duration-300">
+                    <div class="flex justify-between items-start mb-3 gap-2">
+                        <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 text-sm tracking-tight">SPF Protocol</h3>
+                        <span id="spfBadge" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 tracking-widest">--</span>
+                    </div>
+                    <div class="bg-zinc-50 border border-zinc-100 text-zinc-600 dark:bg-zinc-950 dark:border-zinc-800 p-3.5 rounded-xl font-mono text-[11px] sm:text-xs dark:text-zinc-400 break-all whitespace-pre-wrap min-h-[60px] flex items-center transition-colors duration-300 mt-auto">
+                        <span id="spfRecord">--</span>
+                    </div>
+                </div>
+
+                <!-- DMARC Card -->
+                <div class="bg-white border-zinc-200 dark:bg-zinc-900 border dark:border-zinc-800 p-5 rounded-2xl flex flex-col shadow-sm transition-colors duration-300">
+                    <div class="flex justify-between items-start mb-3 gap-2">
+                        <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 text-sm tracking-tight">DMARC Policy</h3>
+                        <span id="dmarcBadge" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 tracking-widest">--</span>
+                    </div>
+                    <div class="bg-zinc-50 border border-zinc-100 text-zinc-600 dark:bg-zinc-950 dark:border-zinc-800 p-3.5 rounded-xl font-mono text-[11px] sm:text-xs dark:text-zinc-400 break-all whitespace-pre-wrap min-h-[60px] flex items-center transition-colors duration-300 mt-auto">
+                        <span id="dmarcRecord">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contextual Analysis -->
+            <div class="bg-white border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 p-6 sm:p-8 rounded-2xl shadow-sm transition-colors duration-300">
+                <h4 class="text-[11px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-4 flex items-center">
+                    <svg class="w-3.5 h-3.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Analysis & Impact
+                </h4>
+                <div id="plainEnglishText" class="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed space-y-4">
+                    --
+                </div>
+            </div>
+
+            <!-- Primary Action Call -->
+            <div class="bg-zinc-900 dark:bg-white p-8 sm:p-10 rounded-2xl text-center shadow-lg transition-colors duration-300 mt-2 relative overflow-hidden">
+                <!-- Subtle background decoration -->
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent dark:from-zinc-900 pointer-events-none"></div>
+                
+                <div class="relative z-10 max-w-lg mx-auto space-y-4">
+                    <h3 class="text-xl sm:text-2xl font-bold text-white dark:text-zinc-900 tracking-tight">Need immediate deliverability rescue?</h3>
+                    <p class="text-zinc-400 dark:text-zinc-600 text-sm leading-relaxed">
+                        Engage our setup service to correctly align your DNS zone files, establish DKIM keys, and enforce your DMARC policy in under 45 minutes.
+                    </p>
+                    <div class="pt-4">
+                        <button 
+                            onclick="UI.openModal()" 
+                            class="w-full sm:w-auto bg-white text-zinc-900 hover:bg-zinc-100 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800 font-semibold px-8 py-3.5 rounded-xl transition duration-200 inline-flex items-center justify-center space-x-2 text-sm shadow-sm"
+                        >
+                            <span>Request Emergency 45-Minute Fix</span>
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Refined Footer linking back to the Masterbrand -->
+    <footer class="py-8 text-center text-zinc-400 dark:text-zinc-600 text-[11px] font-medium tracking-wide transition-colors duration-300">
+        <div class="flex items-center justify-center space-x-1.5">
+            <span>Powered by</span>
+            <span class="text-zinc-900 dark:text-zinc-400 font-bold tracking-widest uppercase">Piercon</span>
+            <span>Infrastructure</span>
+        </div>
+        <p class="mt-2 opacity-60">&copy; 2026. Secure Data Routing.</p>
+    </footer>
+
+    <!-- Elegant Emergency Consultation Modal -->
+    <div id="emergencyModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6 bg-zinc-900/40 dark:bg-black/60 backdrop-blur-sm transition-opacity opacity-0 duration-300">
+        <div class="bg-white border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl transition-all transform scale-95 duration-300 flex flex-col max-h-[90vh]">
+            
+            <button onclick="UI.closeModal()" aria-label="Close" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <div class="mb-5 shrink-0">
+                <h3 class="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Initiate Infrastructure Fix</h3>
+                <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-1.5 leading-relaxed">
+                    Direct your configuration request to <span class="text-zinc-800 dark:text-zinc-200 font-mono text-[12px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">praisetaiwo@gmail.com</span>.
+                </p>
+            </div>
+
+            <div class="flex flex-col flex-grow overflow-hidden min-h-0">
+                <div class="flex items-center justify-between text-xs mb-2 shrink-0">
+                    <span class="text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-widest text-[10px]">Email Blueprint</span>
+                    <span id="modalDomainName" class="font-mono text-zinc-400 dark:text-zinc-500 truncate max-w-[150px]"></span>
+                </div>
+                
+                <textarea 
+                    id="emailTemplateText" 
+                    aria-label="Email Draft"
+                    class="w-full flex-grow bg-zinc-50 border border-zinc-200 text-zinc-800 dark:bg-zinc-950/50 dark:border-zinc-800 rounded-xl p-4 text-sm dark:text-zinc-300 resize-none focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition scrollbar-thin transition-colors duration-300 leading-relaxed min-h-[160px]"
+                    oninput="App.updateMailtoLink()"
+                ></textarea>
+                
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 shrink-0">
+                    <a 
+                        id="modalEmailLink" 
+                        href="#" 
+                        class="flex-1 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-medium p-3.5 rounded-xl flex items-center justify-center transition text-sm shadow-sm"
+                    >
+                        <svg class="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Launch Mail App
+                    </a>
+                    <button 
+                        onclick="App.copyEmailTemplate()" 
+                        id="copyTemplateBtn"
+                        class="flex-1 bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:text-zinc-300 font-medium p-3.5 rounded-xl flex items-center justify-center transition text-sm dark:border-zinc-700 shadow-sm"
+                    >
+                        <svg class="w-4 h-4 mr-2 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Copy Text
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Engine -->
+    <script>
+        // DOM Caching for Performance
+        const DOM = {
+            form: document.getElementById('auditForm'),
+            input: document.getElementById('domainInput'),
+            btnText: document.getElementById('btnText'),
+            btnSpinner: document.getElementById('btnSpinner'),
+            submitBtn: document.getElementById('submitBtn'),
+            errorBanner: document.getElementById('errorBanner'),
+            resultsContainer: document.getElementById('resultsContainer'),
+            
+            targetDomainLabel: document.getElementById('targetDomainLabel'),
+            spfRecord: document.getElementById('spfRecord'),
+            dmarcRecord: document.getElementById('dmarcRecord'),
+            spfBadge: document.getElementById('spfBadge'),
+            dmarcBadge: document.getElementById('dmarcBadge'),
+            
+            statusBanner: document.getElementById('statusBanner'),
+            vulnerabilityBadge: document.getElementById('vulnerabilityBadge'),
+            statusTitle: document.getElementById('statusTitle'),
+            statusDesc: document.getElementById('statusDesc'),
+            plainEnglishText: document.getElementById('plainEnglishText'),
+
+            modal: document.getElementById('emergencyModal'),
+            modalInner: document.querySelector('#emergencyModal > div'),
+            modalDomainName: document.getElementById('modalDomainName'),
+            emailTemplateText: document.getElementById('emailTemplateText'),
+            modalEmailLink: document.getElementById('modalEmailLink'),
+            copyTemplateBtn: document.getElementById('copyTemplateBtn')
+        };
+
+        // State Management
+        const State = {
+            currentDomain: "",
+            emailSubject: ""
+        };
+
+        // UI Theme Configuration
+        const THEMES = {
+            critical: {
+                banner: "bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900/30 text-rose-800 dark:text-rose-100",
+                badge: "bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-400 dark:border-rose-800/50 border",
+                smallBadge: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800/30"
+            },
+            warning: {
+                banner: "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30 text-amber-900 dark:text-amber-100",
+                badge: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-800/50 border",
+                smallBadge: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800/30"
+            },
+            secure: {
+                banner: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-100",
+                badge: "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800/50 border",
+                smallBadge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/30"
+            }
+        };
+
+        // UI Interactions
+        const UI = {
+            setLoading(isLoading) {
+                if (isLoading) {
+                    DOM.btnText.innerText = "Querying DNS...";
+                    DOM.btnSpinner.classList.remove('hidden');
+                    DOM.submitBtn.disabled = true;
+                    DOM.submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+                    DOM.errorBanner.classList.add('hidden');
+                    DOM.resultsContainer.classList.add('hidden');
+                } else {
+                    DOM.btnText.innerText = "Scan Domain";
+                    DOM.btnSpinner.classList.add('hidden');
+                    DOM.submitBtn.disabled = false;
+                    DOM.submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                }
+            },
+            openModal() {
+                if (!State.currentDomain) return;
+                App.updateModalData(State.currentDomain);
+                DOM.modal.classList.remove('hidden');
+                // Small delay to trigger CSS transition
+                setTimeout(() => {
+                    DOM.modal.classList.remove('opacity-0');
+                    DOM.modalInner.classList.remove('scale-95');
+                    DOM.modalInner.classList.add('scale-100');
+                }, 10);
+            },
+            closeModal() {
+                DOM.modal.classList.add('opacity-0');
+                DOM.modalInner.classList.remove('scale-100');
+                DOM.modalInner.classList.add('scale-95');
+                setTimeout(() => {
+                    DOM.modal.classList.add('hidden');
+                }, 300);
+            }
+        };
+
+        // Application Logic
+        const App = {
+            extractDomain(input) {
+                // Remove protocols, www, paths, and queries to isolate root domain
+                let domain = input.trim().toLowerCase();
+                domain = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0].split('?')[0];
+                return domain;
+            },
+            
+            async fetchDNS(name, type) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+                
+                try {
+                    const response = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=${type}`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    if (!response.ok) throw new Error('API Error');
+                    return await response.json();
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    throw error;
+                }
+            },
+
+            parseTXTResult(data, prefix) {
+                if (!data || !data.Answer) return null;
+                for (const record of data.Answer) {
+                    if (record.type === 16) { 
+                        let cleanData = record.data.replace(/^"|"$/g, '').replace(/" "/g, '');
+                        if (cleanData.toLowerCase().startsWith(prefix.toLowerCase())) {
+                            return cleanData;
+                        }
+                    }
+                }
+                return null;
+            },
+
+            applyTheme(theme, data) {
+                // Use a base set of classes for the banner, then append theme specifics
+                DOM.statusBanner.className = `rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border ${theme.banner}`;
+                
+                DOM.vulnerabilityBadge.innerText = data.badgeText;
+                DOM.vulnerabilityBadge.className = `text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${theme.badge}`;
+                
+                DOM.statusTitle.innerText = data.title;
+                DOM.statusDesc.innerText = data.desc;
+                
+                DOM.dmarcBadge.innerText = data.dmarcBadgeText;
+                DOM.dmarcBadge.className = `text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 tracking-widest ${data.dmarcBadgeTheme}`;
+                
+                DOM.plainEnglishText.innerHTML = data.copy;
+            },
+
+            renderResults(domain, spf, dmarc) {
+                DOM.targetDomainLabel.innerText = domain;
+                DOM.spfRecord.innerText = spf ? spf : "No SPF record found in root TXT zone.";
+                DOM.dmarcRecord.innerText = dmarc ? dmarc : "No DMARC record found at _dmarc." + domain;
+
+                const isDmarcMissing = !dmarc;
+                const isDmarcNone = dmarc && dmarc.toLowerCase().includes('p=none');
+                const isSpfMissing = !spf;
+
+                DOM.spfBadge.innerText = spf ? "CONFIGURED" : "MISSING";
+                DOM.spfBadge.className = `text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 tracking-widest ${spf ? THEMES.secure.smallBadge : THEMES.critical.smallBadge}`;
+
+                if (isDmarcMissing || isSpfMissing) {
+                    this.applyTheme(THEMES.critical, {
+                        badgeText: "Critical Vulnerability",
+                        title: "High Spam Risk Detected",
+                        desc: `Emails originating from ${domain} lack essential cryptographic signatures.`,
+                        dmarcBadgeText: isDmarcMissing ? "MISSING" : "UNPROTECTED",
+                        dmarcBadgeTheme: THEMES.critical.smallBadge,
+                        copy: `
+                            <p>Right now, your domain is like a person sending letters without a signature or an ID card. Because of strict new rules, Google and Yahoo's algorithms automatically drop unauthenticated emails to protect users from spoofing.</p>
+                            <p class="mt-2 text-[13px] font-semibold text-rose-700 dark:text-rose-400">Immediate Action Required: You must add proper SPF and DMARC zone files to your DNS manager to restore basic deliverability.</p>
+                        `
+                    });
+                } else if (isDmarcNone) {
+                    this.applyTheme(THEMES.warning, {
+                        badgeText: "Weak Enforcement",
+                        title: "Monitoring-Only Policy (p=none)",
+                        desc: `${domain} has a DMARC setup, but it provides zero anti-spoofing protection.`,
+                        dmarcBadgeText: "POLICY: NONE",
+                        dmarcBadgeTheme: THEMES.warning.smallBadge,
+                        copy: `
+                            <p>Your DMARC record uses a <code>p=none</code> policy. While this allows you to monitor traffic, it does <strong>not</strong> instruct receiving mailboxes to block unauthorized senders from spoofing your brand.</p>
+                            <p class="mt-2 text-[13px] font-semibold text-amber-700 dark:text-amber-400">Recommended Action: Upgrade your policy to strict enforcement (<code>p=quarantine</code> or <code>p=reject</code>) to secure your domain reputation.</p>
+                        `
+                    });
+                } else {
+                    this.applyTheme(THEMES.secure, {
+                        badgeText: "Secure & Verified",
+                        title: "Optimal Sender Architecture",
+                        desc: `${domain} fully complies with modern B2B email deliverability standards.`,
+                        dmarcBadgeText: "ENFORCED",
+                        dmarcBadgeTheme: THEMES.secure.smallBadge,
+                        copy: `
+                            <p>Excellent. <strong>${domain}</strong> has an active SPF record and an enforced DMARC security policy. Google's post office will accurately recognize you as a verified sender.</p>
+                            <p class="mt-2">Your infrastructure meets the essential verification standards required to maximize primary inbox placement rates.</p>
+                        `
+                    });
+                }
+            },
+
+            updateModalData(domain) {
+                DOM.modalDomainName.innerText = domain;
+                State.emailSubject = `Emergency Deliverability Resolution: ${domain}`;
+                
+                const templateBody = `Hi Praise,\n\nI ran a diagnostic scan on ${domain} using the Piercon tool and noted that we are missing critical DNS authentication records.\n\nI need to engage your setup service to correctly align our SPF, DKIM, and DMARC zone files to ensure our outreach lands in the primary inbox.\n\nPlease let me know the required next steps to proceed with the 45-minute fix.\n\nBest regards,`;
+                
+                DOM.emailTemplateText.value = templateBody;
+                this.updateMailtoLink(); 
+            },
+
+            updateMailtoLink() {
+                const encodedSubject = encodeURIComponent(State.emailSubject);
+                const encodedBody = encodeURIComponent(DOM.emailTemplateText.value);
+                DOM.modalEmailLink.href = `mailto:praisetaiwo@gmail.com?subject=${encodedSubject}&body=${encodedBody}`;
+            },
+
+            async copyEmailTemplate() {
+                try {
+                    await navigator.clipboard.writeText(DOM.emailTemplateText.value);
+                    const originalHTML = DOM.copyTemplateBtn.innerHTML;
+                    
+                    DOM.copyTemplateBtn.innerHTML = `<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!`;
+                    DOM.copyTemplateBtn.classList.replace('text-zinc-700', 'text-emerald-700');
+                    DOM.copyTemplateBtn.classList.replace('dark:text-zinc-300', 'dark:text-emerald-400');
+                    
+                    setTimeout(() => {
+                        DOM.copyTemplateBtn.innerHTML = originalHTML;
+                        DOM.copyTemplateBtn.classList.replace('text-emerald-700', 'text-zinc-700');
+                        DOM.copyTemplateBtn.classList.replace('dark:text-emerald-400', 'dark:text-zinc-300');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+            },
+
+            async handleFormSubmit(e) {
+                e.preventDefault();
+                const cleanDomain = App.extractDomain(DOM.input.value);
+                if (!cleanDomain || !cleanDomain.includes('.')) {
+                    DOM.errorBanner.classList.remove('hidden');
+                    return;
+                }
+
+                State.currentDomain = cleanDomain;
+                UI.setLoading(true);
+
+                try {
+                    const [spfData, dmarcData] = await Promise.all([
+                        App.fetchDNS(cleanDomain, 'TXT'),
+                        App.fetchDNS(`_dmarc.${cleanDomain}`, 'TXT')
+                    ]);
+
+                    const spfRecord = App.parseTXTResult(spfData, 'v=spf1');
+                    const dmarcRecord = App.parseTXTResult(dmarcData, 'v=dmarc1');
+
+                    App.renderResults(cleanDomain, spfRecord, dmarcRecord);
+                    
+                    DOM.resultsContainer.classList.remove('hidden');
+                    DOM.resultsContainer.classList.add('animate-slide-up');
+                    
+                    // Smooth scroll to results
+                    setTimeout(() => {
+                        DOM.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+
+                } catch (err) {
+                    DOM.errorBanner.classList.remove('hidden');
+                } finally {
+                    UI.setLoading(false);
+                }
+            }
+        };
+
+        // Event Listeners
+        DOM.form.addEventListener('submit', App.handleFormSubmit);
+        
+        // Close modal on outside click
+        DOM.modal.addEventListener('click', (e) => {
+            if (e.target === DOM.modal) UI.closeModal();
+        });
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !DOM.modal.classList.contains('hidden')) {
+                UI.closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
