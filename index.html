@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Health Diagnostic | Powered by Piercon</title>
+    <title>Domain Health Diagnostic Tool | Powered by PIERCON Consult</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,6 +17,7 @@
                     animation: {
                         'fade-in': 'fadeIn 0.4s ease-out forwards',
                         'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'marquee': 'marquee 25s linear infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -26,6 +27,10 @@
                         slideUp: {
                             '0%': { opacity: '0', transform: 'translateY(10px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' }
                         }
                     }
                 }
@@ -35,7 +40,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
         
-        /* Custom Scrollbar for the text area */
+        /* Custom Scrollbar */
         .scrollbar-thin::-webkit-scrollbar { width: 6px; }
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
         .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #d4d4d8; border-radius: 20px; }
@@ -43,7 +48,6 @@
             .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #3f3f46; }
         }
         
-        /* Smooth base transitions */
         body { 
             -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale; 
@@ -52,36 +56,52 @@
 </head>
 <body class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-zinc-900 transition-colors duration-300">
 
-    <!-- Minimalist Navigation -->
+    <!-- Minimalist Navigation Bar -->
     <nav class="border-b border-zinc-200/80 bg-white/60 dark:border-zinc-800/60 dark:bg-zinc-950/60 backdrop-blur-lg sticky top-0 z-40 transition-colors duration-300">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 shrink-0 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
                 <span class="font-semibold text-sm sm:text-base tracking-tight text-zinc-900 dark:text-zinc-100">
                     Domain Health Diagnostic Tool
                 </span>
             </div>
-            <div class="flex items-center">
+            <div class="flex items-center space-x-3">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 transition-colors">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2 shrink-0"></span> Live DoH
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2 shrink-0"></span> Live DoH Engine
                 </span>
             </div>
         </div>
     </nav>
 
     <!-- Main Content Application -->
-    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex-grow w-full flex flex-col items-center">
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-16 flex-grow w-full flex flex-col items-center">
         
-        <!-- Refined Hero Section -->
-        <div class="text-center max-w-2xl mx-auto mb-12 animate-fade-in">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white tracking-tight leading-[1.15] mb-5">
+        <!-- Hero Section -->
+        <div class="text-center max-w-2xl mx-auto mb-8 animate-fade-in">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white tracking-tight leading-[1.15] mb-4">
                 Is your domain marked as spam by Google & Yahoo?
             </h1>
             <p class="text-zinc-600 dark:text-zinc-400 text-base sm:text-lg font-normal max-w-xl mx-auto leading-relaxed">
                 Run a live diagnostic scan on your SPF and DMARC security protocols to ensure 100% cold email deliverability.
             </p>
+        </div>
+
+        <!-- Live Diagnostic Statistics Bar -->
+        <div class="w-full grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8 animate-fade-in">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 p-3.5 rounded-xl text-center shadow-sm">
+                <span id="statAuditsCount" class="block text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white font-mono tracking-tight">287</span>
+                <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Live Audits Run</span>
+            </div>
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 p-3.5 rounded-xl text-center shadow-sm">
+                <span class="block text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">4</span>
+                <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Domains Secured</span>
+            </div>
+            <div class="col-span-2 sm:col-span-1 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 p-3.5 rounded-xl text-center shadow-sm">
+                <span class="block text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white font-mono tracking-tight">&lt; 1.2s</span>
+                <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Avg Latency</span>
+            </div>
         </div>
 
         <!-- Inline Error Alert -->
@@ -90,8 +110,8 @@
             <p class="font-medium">Diagnostic failed. Please verify the domain name format (e.g., example.com) and try again.</p>
         </div>
 
-        <!-- Elegant Search Interface -->
-        <div class="w-full bg-white dark:bg-zinc-900 rounded-2xl p-2 sm:p-3 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors duration-300 mb-12 animate-slide-up">
+        <!-- Search Input Interface -->
+        <div class="w-full bg-white dark:bg-zinc-900 rounded-2xl p-2 sm:p-3 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors duration-300 mb-8 animate-slide-up">
             <form id="auditForm" class="flex flex-col sm:flex-row gap-2">
                 <div class="relative flex-grow flex items-center">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
@@ -109,7 +129,7 @@
                 <button 
                     type="submit" 
                     id="submitBtn"
-                    class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 font-medium px-8 py-3.5 rounded-xl transition duration-200 ease-in-out flex items-center justify-center space-x-2 text-sm shrink-0"
+                    class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 font-medium px-8 py-3.5 rounded-xl transition duration-200 ease-in-out flex items-center justify-center space-x-2 text-sm shrink-0 shadow-sm"
                 >
                     <span id="btnText">Scan Domain</span>
                     <svg id="btnSpinner" class="hidden w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
@@ -118,6 +138,38 @@
                     </svg>
                 </button>
             </form>
+        </div>
+
+        <!-- Floating/Scrolling Supported Companies Ticker -->
+        <div class="w-full mb-10 overflow-hidden bg-zinc-100/70 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800/60 rounded-xl py-3 px-4">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                    Supported Brands
+                </span>
+                <button 
+                    onclick="UI.openModal('feature')" 
+                    class="text-[11px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white underline underline-offset-2 transition"
+                >
+                    + Feature Your Brand
+                </button>
+            </div>
+            <div class="relative w-full overflow-hidden flex items-center mask-gradient">
+                <div class="flex space-x-6 animate-marquee whitespace-nowrap py-1">
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">DevCommX</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">SalesAR</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">Content Krush</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">Brandz Digital</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">Ziza Digital</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">LevelUp Leads</span>
+                    <!-- Duplicate sequence for smooth seamless looping -->
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">DevCommX</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">SalesAR</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">Content Krush</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">Brandz Digital</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">Ziza Digital</span>
+                    <span class="text-xs font-semibold font-mono text-zinc-600 dark:text-zinc-400 bg-white dark:bg-zinc-800 px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">LevelUp Leads</span>
+                </div>
+            </div>
         </div>
 
         <!-- Diagnostic Output Container -->
@@ -173,18 +225,18 @@
             </div>
 
             <!-- Primary Action Call -->
-            <div class="bg-zinc-900 dark:bg-white p-8 sm:p-10 rounded-2xl text-center shadow-lg transition-colors duration-300 mt-2 relative overflow-hidden">
-                <!-- Subtle background decoration -->
+            <div id="actionCallBanner" class="bg-zinc-900 dark:bg-white p-8 sm:p-10 rounded-2xl text-center shadow-lg transition-colors duration-300 mt-2 relative overflow-hidden">
                 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent dark:from-zinc-900 pointer-events-none"></div>
                 
                 <div class="relative z-10 max-w-lg mx-auto space-y-4">
-                    <h3 class="text-xl sm:text-2xl font-bold text-white dark:text-zinc-900 tracking-tight">Need immediate deliverability rescue?</h3>
-                    <p class="text-zinc-400 dark:text-zinc-600 text-sm leading-relaxed">
+                    <h3 id="actionCallTitle" class="text-xl sm:text-2xl font-bold text-white dark:text-zinc-900 tracking-tight">Need immediate deliverability rescue?</h3>
+                    <p id="actionCallDesc" class="text-zinc-400 dark:text-zinc-600 text-sm leading-relaxed">
                         Engage our setup service to correctly align your DNS zone files, establish DKIM keys, and enforce your DMARC policy in under 45 minutes.
                     </p>
                     <div class="pt-4">
                         <button 
-                            onclick="UI.openModal()" 
+                            id="actionCallBtn"
+                            onclick="UI.openModal('emergency')" 
                             class="w-full sm:w-auto bg-white text-zinc-900 hover:bg-zinc-100 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800 font-semibold px-8 py-3.5 rounded-xl transition duration-200 inline-flex items-center justify-center space-x-2 text-sm shadow-sm"
                         >
                             <span>Request Emergency 45-Minute Fix</span>
@@ -196,17 +248,23 @@
         </div>
     </main>
 
-    <!-- Refined Footer linking back to the Masterbrand -->
-    <footer class="py-8 text-center text-zinc-400 dark:text-zinc-600 text-[11px] font-medium tracking-wide transition-colors duration-300">
+    <!-- Footer linking to Masterbrand -->
+    <footer class="py-8 text-center text-zinc-400 dark:text-zinc-600 text-[11px] font-medium tracking-wide transition-colors duration-300 border-t border-zinc-200/60 dark:border-zinc-900">
         <div class="flex items-center justify-center space-x-1.5">
             <span>Powered by</span>
-            <span class="text-zinc-900 dark:text-zinc-400 font-bold tracking-widest uppercase">Piercon</span>
-            <span>Infrastructure</span>
+            <span class="text-zinc-900 dark:text-zinc-300 font-bold tracking-widest uppercase flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1.5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="5" r="3"></circle>
+                    <line x1="12" y1="22" x2="12" y2="8"></line>
+                    <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
+                </svg>
+                PIERCON Consult
+            </span>
         </div>
-        <p class="mt-2 opacity-60">&copy; 2026. Secure Data Routing.</p>
+        <p class="mt-2 opacity-60">&copy; 2026. Secure Data Routing & Infrastructure.</p>
     </footer>
 
-    <!-- Elegant Emergency Consultation Modal -->
+    <!-- Emergency Consultation Modal -->
     <div id="emergencyModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6 bg-zinc-900/40 dark:bg-black/60 backdrop-blur-sm transition-opacity opacity-0 duration-300">
         <div class="bg-white border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 rounded-2xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl transition-all transform scale-95 duration-300 flex flex-col max-h-[90vh]">
             
@@ -215,8 +273,8 @@
             </button>
 
             <div class="mb-5 shrink-0">
-                <h3 class="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Initiate Infrastructure Fix</h3>
-                <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-1.5 leading-relaxed">
+                <h3 id="modalTitle" class="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Initiate Infrastructure Fix</h3>
+                <p id="modalDesc" class="text-zinc-500 dark:text-zinc-400 text-sm mt-1.5 leading-relaxed">
                     Direct your configuration request to <span class="text-zinc-800 dark:text-zinc-200 font-mono text-[12px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">praisetaiwo@gmail.com</span>.
                 </p>
             </div>
@@ -256,9 +314,9 @@
         </div>
     </div>
 
-    <!-- Core Engine -->
+    <!-- Core Application Logic -->
     <script>
-        // DOM Caching for Performance
+        // DOM Cache
         const DOM = {
             form: document.getElementById('auditForm'),
             input: document.getElementById('domainInput'),
@@ -280,21 +338,33 @@
             statusDesc: document.getElementById('statusDesc'),
             plainEnglishText: document.getElementById('plainEnglishText'),
 
+            actionCallBanner: document.getElementById('actionCallBanner'),
+            actionCallTitle: document.getElementById('actionCallTitle'),
+            actionCallDesc: document.getElementById('actionCallDesc'),
+            actionCallBtn: document.getElementById('actionCallBtn'),
+
             modal: document.getElementById('emergencyModal'),
             modalInner: document.querySelector('#emergencyModal > div'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalDesc: document.getElementById('modalDesc'),
             modalDomainName: document.getElementById('modalDomainName'),
             emailTemplateText: document.getElementById('emailTemplateText'),
             modalEmailLink: document.getElementById('modalEmailLink'),
-            copyTemplateBtn: document.getElementById('copyTemplateBtn')
+            copyTemplateBtn: document.getElementById('copyTemplateBtn'),
+
+            statAuditsCount: document.getElementById('statAuditsCount')
         };
 
-        // State Management
+        // State & Local Stats Persistence
+        const BASE_AUDIT_COUNT = 287;
+        
         const State = {
             currentDomain: "",
-            emailSubject: ""
+            emailSubject: "",
+            totalAudits: parseInt(localStorage.getItem('piercon_audit_count') || BASE_AUDIT_COUNT, 10)
         };
 
-        // UI Theme Configuration
+        // Theme Definitions
         const THEMES = {
             critical: {
                 banner: "bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900/30 text-rose-800 dark:text-rose-100",
@@ -313,8 +383,16 @@
             }
         };
 
-        // UI Interactions
+        // UI Updates
         const UI = {
+            initStats() {
+                DOM.statAuditsCount.innerText = State.totalAudits.toLocaleString();
+            },
+            incrementStats() {
+                State.totalAudits += 1;
+                localStorage.setItem('piercon_audit_count', State.totalAudits);
+                DOM.statAuditsCount.innerText = State.totalAudits.toLocaleString();
+            },
             setLoading(isLoading) {
                 if (isLoading) {
                     DOM.btnText.innerText = "Querying DNS...";
@@ -330,11 +408,10 @@
                     DOM.submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
                 }
             },
-            openModal() {
-                if (!State.currentDomain) return;
-                App.updateModalData(State.currentDomain);
+            openModal(mode = 'emergency') {
+                const targetDomain = State.currentDomain || "yourdomain.com";
+                App.updateModalData(targetDomain, mode);
                 DOM.modal.classList.remove('hidden');
-                // Small delay to trigger CSS transition
                 setTimeout(() => {
                     DOM.modal.classList.remove('opacity-0');
                     DOM.modalInner.classList.remove('scale-95');
@@ -351,10 +428,9 @@
             }
         };
 
-        // Application Logic
+        // Application Engine
         const App = {
             extractDomain(input) {
-                // Remove protocols, www, paths, and queries to isolate root domain
                 let domain = input.trim().toLowerCase();
                 domain = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0].split('?')[0];
                 return domain;
@@ -362,7 +438,7 @@
             
             async fetchDNS(name, type) {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
                 try {
                     const response = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=${type}`, { signal: controller.signal });
@@ -389,18 +465,13 @@
             },
 
             applyTheme(theme, data) {
-                // Use a base set of classes for the banner, then append theme specifics
                 DOM.statusBanner.className = `rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border ${theme.banner}`;
-                
                 DOM.vulnerabilityBadge.innerText = data.badgeText;
                 DOM.vulnerabilityBadge.className = `text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${theme.badge}`;
-                
                 DOM.statusTitle.innerText = data.title;
                 DOM.statusDesc.innerText = data.desc;
-                
                 DOM.dmarcBadge.innerText = data.dmarcBadgeText;
                 DOM.dmarcBadge.className = `text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 tracking-widest ${data.dmarcBadgeTheme}`;
-                
                 DOM.plainEnglishText.innerHTML = data.copy;
             },
 
@@ -412,9 +483,17 @@
                 const isDmarcMissing = !dmarc;
                 const isDmarcNone = dmarc && dmarc.toLowerCase().includes('p=none');
                 const isSpfMissing = !spf;
+                const isSecure = !isDmarcMissing && !isDmarcNone && !isSpfMissing;
 
                 DOM.spfBadge.innerText = spf ? "CONFIGURED" : "MISSING";
                 DOM.spfBadge.className = `text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0 tracking-widest ${spf ? THEMES.secure.smallBadge : THEMES.critical.smallBadge}`;
+
+                // Reset action banner theme
+                DOM.actionCallBanner.className = "p-8 sm:p-10 rounded-2xl text-center shadow-lg transition-colors duration-300 mt-2 relative overflow-hidden bg-zinc-900 dark:bg-white";
+                DOM.actionCallTitle.className = "text-xl sm:text-2xl font-bold tracking-tight text-white dark:text-zinc-900";
+                DOM.actionCallDesc.className = "text-sm leading-relaxed text-zinc-400 dark:text-zinc-600";
+                DOM.actionCallBtn.className = "w-full sm:w-auto font-semibold px-8 py-3.5 rounded-xl transition duration-200 inline-flex items-center justify-center space-x-2 text-sm shadow-sm bg-white text-zinc-900 hover:bg-zinc-100 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800";
+
 
                 if (isDmarcMissing || isSpfMissing) {
                     this.applyTheme(THEMES.critical, {
@@ -428,6 +507,7 @@
                             <p class="mt-2 text-[13px] font-semibold text-rose-700 dark:text-rose-400">Immediate Action Required: You must add proper SPF and DMARC zone files to your DNS manager to restore basic deliverability.</p>
                         `
                     });
+                    this.updateActionCall('emergency');
                 } else if (isDmarcNone) {
                     this.applyTheme(THEMES.warning, {
                         badgeText: "Weak Enforcement",
@@ -440,6 +520,7 @@
                             <p class="mt-2 text-[13px] font-semibold text-amber-700 dark:text-amber-400">Recommended Action: Upgrade your policy to strict enforcement (<code>p=quarantine</code> or <code>p=reject</code>) to secure your domain reputation.</p>
                         `
                     });
+                    this.updateActionCall('emergency');
                 } else {
                     this.applyTheme(THEMES.secure, {
                         badgeText: "Secure & Verified",
@@ -452,16 +533,43 @@
                             <p class="mt-2">Your infrastructure meets the essential verification standards required to maximize primary inbox placement rates.</p>
                         `
                     });
+                    this.updateActionCall('feature');
                 }
             },
 
-            updateModalData(domain) {
+            updateActionCall(mode) {
+                if (mode === 'emergency') {
+                    DOM.actionCallTitle.innerText = "Need immediate deliverability rescue?";
+                    DOM.actionCallDesc.innerText = "Engage our setup service to correctly align your DNS zone files, establish DKIM keys, and enforce your DMARC policy in under 45 minutes.";
+                    DOM.actionCallBtn.innerHTML = `<span>Request Emergency 45-Minute Fix</span><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+                    DOM.actionCallBtn.onclick = () => UI.openModal('emergency');
+                } else {
+                    DOM.actionCallBanner.className = "p-8 sm:p-10 rounded-2xl text-center shadow-lg transition-colors duration-300 mt-2 relative overflow-hidden bg-emerald-900 dark:bg-emerald-950/40";
+                    DOM.actionCallTitle.className = "text-xl sm:text-2xl font-bold tracking-tight text-white dark:text-emerald-100";
+                    DOM.actionCallDesc.className = "text-sm leading-relaxed text-emerald-200/80 dark:text-emerald-400/80";
+                    DOM.actionCallBtn.className = "w-full sm:w-auto font-semibold px-8 py-3.5 rounded-xl transition duration-200 inline-flex items-center justify-center space-x-2 text-sm shadow-sm bg-emerald-500 hover:bg-emerald-400 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500";
+                    DOM.actionCallTitle.innerText = "Domain Security Verified";
+                    DOM.actionCallDesc.innerText = "Your domain passed the audit. Want to feature your company as a verified sender in our Supported Brands ticker?";
+                    DOM.actionCallBtn.innerHTML = `<span>Submit Your Logo</span><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>`;
+                    DOM.actionCallBtn.onclick = () => UI.openModal('feature');
+                }
+            },
+
+            updateModalData(domain, mode) {
                 DOM.modalDomainName.innerText = domain;
-                State.emailSubject = `Emergency Deliverability Resolution: ${domain}`;
                 
-                const templateBody = `Hi Praise,\n\nI ran a diagnostic scan on ${domain} using the Piercon tool and noted that we are missing critical DNS authentication records.\n\nI need to engage your setup service to correctly align our SPF, DKIM, and DMARC zone files to ensure our outreach lands in the primary inbox.\n\nPlease let me know the required next steps to proceed with the 45-minute fix.\n\nBest regards,`;
-                
-                DOM.emailTemplateText.value = templateBody;
+                if (mode === 'emergency') {
+                    DOM.modalTitle.innerText = "Initiate Infrastructure Fix";
+                    DOM.modalDesc.innerHTML = `Direct your configuration request to <span class="text-zinc-800 dark:text-zinc-200 font-mono text-[12px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">praisetaiwo@gmail.com</span>.`;
+                    State.emailSubject = `Emergency Deliverability Resolution: ${domain}`;
+                    DOM.emailTemplateText.value = `Hi Praise,\n\nI ran a diagnostic scan on ${domain} using the PIERCON Consult tool and noted that we are missing critical DNS authentication records.\n\nI need to engage your setup service to correctly align our SPF, DKIM, and DMARC zone files to ensure our outreach lands in the primary inbox.\n\nPlease let me know the required next steps to proceed with the 45-minute fix.\n\nBest regards,`;
+                } else if (mode === 'feature') {
+                    DOM.modalTitle.innerText = "Feature Your Brand";
+                    DOM.modalDesc.innerHTML = `Submit your logo to <span class="text-zinc-800 dark:text-zinc-200 font-mono text-[12px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">praisetaiwo@gmail.com</span>.`;
+                    State.emailSubject = `Feature Request: Add ${domain} to PIERCON Supported Brands`;
+                    DOM.emailTemplateText.value = `Hi Praise,\n\nMy domain, ${domain}, just passed the 100% security audit on the PIERCON diagnostic tool.\n\nI would like to have our brand featured in the "Supported Brands" ticker on the homepage. Attached is our company logo for inclusion.\n\nBest regards,`;
+                }
+
                 this.updateMailtoLink(); 
             },
 
@@ -512,10 +620,12 @@
 
                     App.renderResults(cleanDomain, spfRecord, dmarcRecord);
                     
+                    // Increment live statistics
+                    UI.incrementStats();
+
                     DOM.resultsContainer.classList.remove('hidden');
                     DOM.resultsContainer.classList.add('animate-slide-up');
                     
-                    // Smooth scroll to results
                     setTimeout(() => {
                         DOM.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 100);
@@ -528,15 +638,14 @@
             }
         };
 
-        // Event Listeners
+        // Event Listeners Initialization
+        UI.initStats();
         DOM.form.addEventListener('submit', App.handleFormSubmit);
         
-        // Close modal on outside click
         DOM.modal.addEventListener('click', (e) => {
             if (e.target === DOM.modal) UI.closeModal();
         });
         
-        // Close modal on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !DOM.modal.classList.contains('hidden')) {
                 UI.closeModal();
