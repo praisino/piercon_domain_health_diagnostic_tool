@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Domain Health Diagnostic Tool | Powered by PIERCON Consult</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             darkMode: 'media',
@@ -253,11 +254,7 @@
         <div class="flex items-center justify-center space-x-1.5">
             <span>Powered by</span>
             <span class="text-zinc-900 dark:text-zinc-300 font-bold tracking-widest uppercase flex items-center">
-                <svg class="w-3.5 h-3.5 mr-1.5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="5" r="3"></circle>
-                    <line x1="12" y1="22" x2="12" y2="8"></line>
-                    <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
-                </svg>
+                <i class="fa-solid fa-anchor mr-2 opacity-80 text-[14px]"></i>
                 PIERCON Consult
             </span>
         </div>
@@ -361,7 +358,9 @@
         const State = {
             currentDomain: "",
             emailSubject: "",
-            totalAudits: parseInt(localStorage.getItem('piercon_audit_count') || BASE_AUDIT_COUNT, 10)
+            totalAudits: parseInt(localStorage.getItem('piercon_audit_count') || BASE_AUDIT_COUNT, 10),
+            // TODO: Paste your Google Apps Script Web App URL here after deployment
+            appsScriptUrl: "https://script.google.com/macros/s/AKfycbwyLLqQCE09L0xFesJ24HYIrVq98X-28iajPg7Vrj2GcVet841aKLo32JwY3-qPbjg_/exec" 
         };
 
         // Theme Definitions
@@ -530,7 +529,7 @@
                         dmarcBadgeTheme: THEMES.secure.smallBadge,
                         copy: `
                             <p>Excellent. <strong>${domain}</strong> has an active SPF record and an enforced DMARC security policy. Google's post office will accurately recognize you as a verified sender.</p>
-                            <p class="mt-2">Your infrastructure meets the essential verification standards required to maximize primary inbox placement rates.</p>
+                            <p class="mt-2">Your infrastructure meets the essential verification standards required to maximize primary inbox placement rates. <a href="#" onclick="UI.openModal('feature'); return false;" class="text-emerald-700 dark:text-emerald-400 font-semibold hover:underline decoration-emerald-500/30 underline-offset-2">Click here to feature your brand in our ticker below.</a></p>
                         `
                     });
                     this.updateActionCall('feature');
@@ -622,6 +621,23 @@
                     
                     // Increment live statistics
                     UI.incrementStats();
+
+                    // Send data to Google Sheets backend silently
+                    if (State.appsScriptUrl !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
+                        const statusLevel = (!dmarcRecord || !spfRecord) ? "CRITICAL" : 
+                                       (dmarcRecord.toLowerCase().includes('p=none') ? "HIGH" : "SECURE");
+                        
+                        fetch(State.appsScriptUrl, {
+                            method: 'POST',
+                            mode: 'no-cors', // Prevents CORS preflight blocks on static sites
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                domain: cleanDomain,
+                                status: statusLevel,
+                                sourceOrigin: window.location.hostname
+                            })
+                        }).catch(err => console.log("Analytics ping silent fail"));
+                    }
 
                     DOM.resultsContainer.classList.remove('hidden');
                     DOM.resultsContainer.classList.add('animate-slide-up');
