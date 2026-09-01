@@ -359,7 +359,6 @@
             currentDomain: "",
             emailSubject: "",
             totalAudits: parseInt(localStorage.getItem('piercon_audit_count') || BASE_AUDIT_COUNT, 10),
-            // TODO: Paste your Google Apps Script Web App URL here after deployment
             appsScriptUrl: "https://script.google.com/macros/s/AKfycbwyLLqQCE09L0xFesJ24HYIrVq98X-28iajPg7Vrj2GcVet841aKLo32JwY3-qPbjg_/exec" 
         };
 
@@ -632,6 +631,7 @@
                             mode: 'no-cors', // Prevents CORS preflight blocks on static sites
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
+                                secret: "piercon_secure_2026", // <-- THE NEW SECRET TOKEN GUARD IS HERE
                                 domain: cleanDomain,
                                 status: statusLevel,
                                 sourceOrigin: window.location.hostname
