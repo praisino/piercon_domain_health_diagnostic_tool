@@ -622,7 +622,7 @@
                     UI.incrementStats();
 
                     // Send data to Google Sheets backend silently
-                    if (State.appsScriptUrl !== "https://script.google.com/macros/s/AKfycbwyLLqQCE09L0xFesJ24HYIrVq98X-28iajPg7Vrj2GcVet841aKLo32JwY3-qPbjg_/exec") {
+                    if (State.appsScriptUrl !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
                         const statusLevel = (!dmarcRecord || !spfRecord) ? "CRITICAL" : 
                                        (dmarcRecord.toLowerCase().includes('p=none') ? "HIGH" : "SECURE");
                         
