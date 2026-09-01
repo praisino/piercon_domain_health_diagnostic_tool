@@ -631,9 +631,11 @@
                             mode: 'no-cors', // Prevents CORS preflight blocks on static sites
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                secret: "piercon_secure_2026", // <-- THE NEW SECRET TOKEN GUARD IS HERE
+                                secret: "piercon_secure_2026",
                                 domain: cleanDomain,
                                 status: statusLevel,
+                                spf: spfRecord ? spfRecord : "Missing",
+                                dmarc: dmarcRecord ? dmarcRecord : "Missing",
                                 sourceOrigin: window.location.hostname
                             })
                         }).catch(err => console.log("Analytics ping silent fail"));
